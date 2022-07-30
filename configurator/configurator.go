@@ -20,14 +20,14 @@ func ConfiguratorUI() error {
 		return err
 	}
 
-	wnd := g.NewMasterWindow("Goonware", 700, 700, 0)
+	wnd := g.NewMasterWindow("Goonware", 700, 700, g.MasterWindowFlagsNotResizable)
 	wnd.Run(func() {
 		g.SingleWindow().Layout(
 			g.TabBar().TabItems(
-				g.TabItem("Annoyances").Layout(AnnoyancesTab(&c)...),
-				g.TabItem("Drive Filler").Layout(DriveFillterTab(&c)...),
+				g.TabItem("Annoyances").Layout(TabWrapper(AnnoyancesTab(&c)...)),
+				g.TabItem("Drive Filler").Layout(TabWrapper(DriveFillterTab(&c)...)),
 				// Comes last
-				g.TabItem("About").Layout(AboutTab()...),
+				g.TabItem("About").Layout(TabWrapper(AboutTab()...)),
 			),
 
 			g.Row(
@@ -71,6 +71,10 @@ func ConfiguratorUI() error {
 	})
 
 	return nil
+}
+
+func TabWrapper(w ...g.Widget) g.Widget {
+	return g.Child().Layout(w...).Size(g.Auto, 580).Flags(g.WindowFlagsNoScrollbar)
 }
 
 func NewOrLoadConfig() (types.Config, error) {
@@ -118,8 +122,9 @@ func NewOrLoadConfig() (types.Config, error) {
 			
 			// Drive Filler
 			DriveFiller: false,
-			DriveFillerDelay: 10,
+			DriveFillerDelay: 1000,
 			DriveFillerBase: Expect(os.UserHomeDir()),
+			DriveFillerBooru: 0,
 			DriveFillerTags: []string{"feral+paws", "feral+rimming"},
 			DriveFillerImageSource: 1,
 			DriveFillerImageUseTags: true,

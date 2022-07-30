@@ -43,6 +43,7 @@ type Config struct {
 	DriveFiller bool
 	DriveFillerDelay int32
 	DriveFillerBase string
+	DriveFillerBooru int32
 	DriveFillerTags []string
 	DriveFillerImageSource int32
 	DriveFillerImageUseTags bool

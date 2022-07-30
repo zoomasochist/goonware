@@ -12,6 +12,7 @@ import (
 
 var selectedTag int32
 var newTag string
+var boorus []string = []string{"https://e621.net/", "https://rule34.xxx/"}
 
 func DriveFillterTab(c *types.Config) []g.Widget {
 	largerFont := g.GetDefaultFonts()[0].SetSize(20)
@@ -59,8 +60,8 @@ func DriveFillterTab(c *types.Config) []g.Widget {
 				StandardSeparation(),
 
 				g.Row(
-					g.Label("Booru"),
-					g.Label("https://e621.net/"),
+					g.Combo("Booru", boorus[c.DriveFillerBooru], boorus, &c.DriveFillerBooru).
+						Size(250),
 				),
 
 				g.Row(
@@ -69,13 +70,20 @@ func DriveFillterTab(c *types.Config) []g.Widget {
 					g.RadioButton("Specific Tags", c.DriveFillerImageUseTags).
 						OnChange(func() { c.DriveFillerImageUseTags = true}),
 				),
-				g.Child().Layout(TagsLayout(c)).Size(300, 300),		
-				g.Row(
-					g.Button("+").OnClick(func() { g.OpenPopup("Add New Tag") }),
-					g.Button("-").OnClick(func() {
-						c.DriveFillerTags = RemoveElement(c.DriveFillerTags, selectedTag)
-					}),
-				),
+				ConditionOrNothing(c.DriveFillerImageUseTags, g.Layout{
+					g.Child().Layout(g.Layout{
+						g.ListBox("Drive Filler Tags", c.DriveFillerTags).
+							Border(false).
+							Size(g.Auto, g.Auto).
+							ContextMenu([]string{"Remove"}).
+								OnMenu(func(i int, m string) {
+									c.DriveFillerTags = RemoveElement(c.DriveFillerTags, int32(i))
+								}),
+					}).Size(300, 300),	
+					g.Row(
+						g.Button("Add").OnClick(func() { g.OpenPopup("Add New Tag") }),
+					),
+				}),
 
 				g.Row(
 					g.Checkbox("Minimum score", &c.DriveFillerDownloadMinimumScoreToggle),
@@ -100,20 +108,10 @@ func SelectBase(c *types.Config) {
 	}
 }
 
-func TagsLayout(c *types.Config) g.Layout {
-	var r g.Layout
-
-	for idx, tag := range c.DriveFillerTags {
-		r = append(r, g.Layout{
-			g.Selectable(tag).
-				OnClick(func() { selectedTag = int32(idx) }).
-				Selected(selectedTag == int32(idx)),
-		})
+func RemoveElement(slice []string, idx int32) []string {
+	if len(slice) == 1 {
+		return []string{}
 	}
 
-	return r
-}
-
-func RemoveElement(slice []string, idx int32) []string {
 	return append(slice[:idx], slice[idx+1:]...)
 }
