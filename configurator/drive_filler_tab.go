@@ -12,6 +12,7 @@ import (
 
 var selectedTag int32
 var newTag string
+var booru int32
 var boorus []string = []string{"https://e621.net/", "https://rule34.xxx/"}
 
 func DriveFillterTab(c *types.Config) []g.Widget {
@@ -45,23 +46,24 @@ func DriveFillterTab(c *types.Config) []g.Widget {
 
 			g.Row(
 				g.Label("Image source"),
-				g.RadioButton("Use Package", c.DriveFillerImageSource == 0).
-					OnChange(func() { c.DriveFillerImageSource = 0 }),
+				g.RadioButton("Use Package", c.DriveFillerImageSource == types.DriveFillerImageSourcePackage).
+					OnChange(func() { c.DriveFillerImageSource = types.DriveFillerImageSourcePackage }),
 				g.Tooltip("Fill the drive with files in the currently loaded package's img directory"),
 
-				g.RadioButton("Download", c.DriveFillerImageSource == 1).
-					OnChange(func() { c.DriveFillerImageSource = 1 }),
+				g.RadioButton("Download", c.DriveFillerImageSource == types.DriveFillerImageSourceBooru).
+					OnChange(func() { c.DriveFillerImageSource = types.DriveFillerImageSourceBooru }),
 				g.Tooltip("Fill the drive with images downloaded from a booru of your choosing"),
 			),
 			StandardSeparation(),
 
-			ConditionOrNothing(c.DriveFillerImageSource == 1, g.Layout{
+			ConditionOrNothing(c.DriveFillerImageSource == types.DriveFillerImageSourceBooru, g.Layout{
 				g.Row(g.Label("Image Downloader").Font(largerFont)),
 				StandardSeparation(),
 
 				g.Row(
-					g.Combo("Booru", boorus[c.DriveFillerBooru], boorus, &c.DriveFillerBooru).
-						Size(250),
+					g.Combo("Booru", c.DriveFillerBooru, boorus, &booru).
+						Size(250).
+						OnChange(func() { c.DriveFillerBooru = boorus[booru] }),
 				),
 
 				g.Row(

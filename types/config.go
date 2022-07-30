@@ -1,5 +1,12 @@
 package types
 
+const (
+	ModeNormal = iota
+	ModeHibernate
+	DriveFillerImageSourcePackage
+	DriveFillerImageSourceBooru
+)
+
 type Config struct {
 	WorkingDirectory string
 	// Mode
@@ -43,7 +50,7 @@ type Config struct {
 	DriveFiller bool
 	DriveFillerDelay int32
 	DriveFillerBase string
-	DriveFillerBooru int32
+	DriveFillerBooru string
 	DriveFillerTags []string
 	DriveFillerImageSource int32
 	DriveFillerImageUseTags bool

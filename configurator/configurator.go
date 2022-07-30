@@ -51,14 +51,14 @@ func ConfiguratorUI() error {
 
 			g.Row(
 				g.Label("Mode"),
-				g.RadioButton("Normal", c.Mode == 0).OnChange(func() { c.Mode = 0 }),
+				g.RadioButton("Normal", c.Mode == types.ModeNormal).OnChange(func() { c.Mode = types.ModeNormal }),
 				g.Tooltip("As soon as Goonware starts, it will start running payloads."),
 	
-				g.RadioButton("Hibernate", c.Mode == 1).OnChange(func() { c.Mode = 1 }),
+				g.RadioButton("Hibernate", c.Mode == types.ModeHibernate).OnChange(func() { c.Mode = types.ModeHibernate }),
 				g.Tooltip("Goonware will wait a random amount of time (within given limits) before" +
 					" spamming payloads, then stop and start waiting again."),
 
-				ConditionOrNothing(c.Mode == 1, g.Layout{
+				ConditionOrNothing(c.Mode == types.ModeHibernate, g.Layout{
 					LabelSliderTooltip("Min. wait", &c.HibernateMinWaitMinutes, 0, 120, 50,
 						"The minimum amount of time Goonware will hibernate", FormatMinuteSlider),
 					LabelSliderTooltip("Max. wait", &c.HibernateMaxWaitMinutes, 0, 120, 50,
@@ -84,10 +84,10 @@ func NewOrLoadConfig() (types.Config, error) {
 		return types.Config{
 			WorkingDirectory: workingDirectory,
 			// General
-			Mode: 0,
+			Mode: types.ModeNormal,
 			HibernateMinWaitMinutes: 120,
 			HibernateMaxWaitMinutes: 3600,
-			HibernateActivityLength: 20,
+			HibernateActivityLength: 20, // Sec
 			StartOnBoot: false,
 			RunOnExit: false,
 			LoadedPackage: "",
@@ -122,11 +122,11 @@ func NewOrLoadConfig() (types.Config, error) {
 			
 			// Drive Filler
 			DriveFiller: false,
-			DriveFillerDelay: 1000,
+			DriveFillerDelay: 1000, // Ms
 			DriveFillerBase: Expect(os.UserHomeDir()),
-			DriveFillerBooru: 0,
+			DriveFillerBooru: "https://e621.net/",
 			DriveFillerTags: []string{"feral+paws", "feral+rimming"},
-			DriveFillerImageSource: 1,
+			DriveFillerImageSource: types.DriveFillerImageSourceBooru,
 			DriveFillerImageUseTags: true,
 			DriveFillerDownloadMinimumScoreToggle: false,
 			DriveFillerDownloadMinimumScoreThreshold: 0,

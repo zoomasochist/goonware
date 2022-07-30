@@ -18,7 +18,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		pkg, err := types.LoadEdgewarePackage(c.LoadedPackage, c.WorkingDirectory)
+		pkg, err := types.LoadEdgewarePackage(c.LoadedPackage, c.WorkingDirectory + "/package/")
 		if err != nil {
 			panic(err)
 		}

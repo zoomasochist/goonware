@@ -3,7 +3,7 @@ module goonware
 go 1.18
 
 require (
-	github.com/AllenDang/giu v0.6.2 // indirect
+	github.com/AllenDang/giu v0.6.2 // direct
 	github.com/AllenDang/go-findfont v0.0.0-20200702051237-9f180485aeb8 // indirect
 	github.com/AllenDang/imgui-go v1.12.1-0.20220322114136-499bbf6a42ad // indirect
 	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
@@ -12,7 +12,7 @@ require (
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20220320163800-277f93cfa958 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/sahilm/fuzzy v0.1.0 // indirect
-	github.com/sqweek/dialog v0.0.0-20220504154117-be45b268883a // indirect
+	github.com/sqweek/dialog v0.0.0-20220504154117-be45b268883a // direct
 	golang.org/x/image v0.0.0-20220302094943-723b81ca9867 // indirect
 	golang.org/x/sys v0.0.0-20220315194320-039c03cc5b86 // indirect
 	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
