@@ -1,12 +1,12 @@
 package types
 
 import (
-	"os"
-	"io"
-	"path"
-	"strings"
 	"archive/zip"
 	"encoding/json"
+	"io"
+	"os"
+	"path"
+	"strings"
 )
 
 // Just.. see the Edgeware readme to explain this.
@@ -28,11 +28,11 @@ type CaptionSet struct {
 }
 
 type EdgewarePackage struct {
-	Sites []Site
-	Prompts []PromptSet
+	Sites        []Site
+	Prompts      []PromptSet
 	MinSentences int
 	MaxSentences int
-	Captions []CaptionSet
+	Captions     []CaptionSet
 	// A path to an image
 	Icon string
 	// A path to an image
@@ -53,7 +53,7 @@ func LoadEdgewarePackage(packagePath, packageExtractDirectory string) (EdgewareP
 	_, err := os.Stat(packageExtractDirectory)
 	if err == nil {
 		err := os.RemoveAll(packageExtractDirectory)
-		if err != nil { 
+		if err != nil {
 			return EdgewarePackage{}, err
 		}
 	} else if !os.IsNotExist(err) {
@@ -89,33 +89,39 @@ func LoadEdgewarePackage(packagePath, packageExtractDirectory string) (EdgewareP
 		}
 
 		defer fileInArchive.Close()
-		
+
 		if _, err := io.Copy(dstFile, fileInArchive); err != nil {
 			return EdgewarePackage{}, err
 		}
 
 		if strings.HasSuffix(filePath, "web.json") {
 			pkg.Sites, err = ParseWebJson(filePath)
-			if err != nil { return EdgewarePackage{}, err }
+			if err != nil {
+				return EdgewarePackage{}, err
+			}
 		} else if strings.HasSuffix(filePath, "prompt.json") {
 			pkg.Prompts, pkg.MinSentences, pkg.MaxSentences, err = ParsePromptJson(filePath)
-			if err != nil { return EdgewarePackage{}, err }
+			if err != nil {
+				return EdgewarePackage{}, err
+			}
 		} else if strings.HasSuffix(filePath, "captions.json") {
 			pkg.Captions, err = ParseCaptionsJson(filePath)
-			if err != nil { return EdgewarePackage{}, err }
+			if err != nil {
+				return EdgewarePackage{}, err
+			}
 		} else if strings.HasSuffix(filePath, "wallpaper.png") {
 			pkg.Wallpaper = filePath
 		} else {
 			dir := path.Dir(filePath)
 
 			if strings.HasSuffix(dir, "img") && (strings.HasSuffix(filePath, "png") ||
-					strings.HasSuffix(filePath, "jpg")) {
+				strings.HasSuffix(filePath, "jpg") || strings.HasSuffix(filePath, "jpeg")) {
 				pkg.ImageFiles = append(pkg.ImageFiles, filePath)
 			} else if strings.HasSuffix(dir, "vid") && (strings.HasSuffix(filePath, "mp4") ||
-					strings.HasSuffix(filePath, "webm")) {
+				strings.HasSuffix(filePath, "webm")) {
 				pkg.VideoFiles = append(pkg.VideoFiles, filePath)
 			} else if strings.HasSuffix(dir, "aud") && (strings.HasSuffix(filePath, "wav") ||
-					strings.HasSuffix(filePath, "mp3")) {
+				strings.HasSuffix(filePath, "mp3")) {
 				pkg.AudioFiles = append(pkg.AudioFiles, filePath)
 			} else if strings.HasSuffix(dir, "subliminals") && strings.HasSuffix(filePath, "gif") {
 				pkg.SubliminalFiles = append(pkg.SubliminalFiles, filePath)
@@ -142,7 +148,7 @@ func ParseWebJson(filePath string) ([]Site, error) {
 
 	for i := 0; i < len(raw["urls"]); i++ {
 		sites = append(sites, Site{
-			Url: raw["urls"][i],
+			Url:   raw["urls"][i],
 			Query: raw["args"][i],
 		})
 	}
@@ -180,10 +186,10 @@ func ParsePromptJson(filePath string) ([]PromptSet, int, int, error) {
 	if err != nil {
 		return []PromptSet{}, 0, 0, err
 	}
-	
+
 	for i := 0; i < len(unmarshalledMoods); i++ {
 		moodName := unmarshalledMoods[i]
-		
+
 		var unmarshalledPrompts []string
 		err = json.Unmarshal(raw[moodName], &unmarshalledPrompts)
 		if err != nil {
@@ -197,9 +203,9 @@ func ParsePromptJson(filePath string) ([]PromptSet, int, int, error) {
 		}
 
 		promptsets = append(promptsets, PromptSet{
-			Mood: string(moodName),
+			Mood:      string(moodName),
 			Frequency: freqList[i],
-			Prompts: unmarshalledPrompts,
+			Prompts:   unmarshalledPrompts,
 		})
 	}
 
@@ -222,7 +228,7 @@ func ParseCaptionsJson(filePath string) ([]CaptionSet, error) {
 
 	for _, prefix := range raw["prefix"] {
 		captionsets = append(captionsets, CaptionSet{
-			Prefix: prefix,
+			Prefix:    prefix,
 			Sentences: raw[prefix],
 		})
 	}

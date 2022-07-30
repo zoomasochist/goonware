@@ -78,7 +78,17 @@ func DoDriveFiller(c *types.Config, pkg *types.EdgewarePackage) {
 
 		image, imageDataCache = imageDataCache[0], imageDataCache[1:]
 	} else if c.DriveFillerImageSource == types.DriveFillerImageSourcePackage {
+		imagePath := pkg.ImageFiles[rand.Intn(len(pkg.ImageFiles))]
+		imageData, err := os.ReadFile(imagePath)
+		if err != nil {
+			panic(err)
+		}
 
+		pathParts := strings.Split(imagePath, ".")
+		image = Image{
+			Ext:   pathParts[len(pathParts)-1],
+			Bytes: imageData,
+		}
 	}
 
 	err := os.WriteFile(savePathNoExt+"."+image.Ext, image.Bytes, 0644)
