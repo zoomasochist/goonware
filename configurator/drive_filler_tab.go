@@ -40,7 +40,7 @@ func DriveFillterTab(c *types.Config) []g.Widget {
 			),
 			g.Row(
 				g.Button("Select base").OnClick(func() { SelectBase(c) }),
-				g.Label("(" + c.DriveFillerBase + ")"),
+				g.Label("("+c.DriveFillerBase+")"),
 			),
 			StandardSeparation(),
 
@@ -70,7 +70,7 @@ func DriveFillterTab(c *types.Config) []g.Widget {
 					g.RadioButton("Anything", !c.DriveFillerImageUseTags).
 						OnChange(func() { c.DriveFillerImageUseTags = false }),
 					g.RadioButton("Specific Tags", c.DriveFillerImageUseTags).
-						OnChange(func() { c.DriveFillerImageUseTags = true}),
+						OnChange(func() { c.DriveFillerImageUseTags = true }),
 				),
 				ConditionOrNothing(c.DriveFillerImageUseTags, g.Layout{
 					g.Child().Layout(g.Layout{
@@ -78,10 +78,10 @@ func DriveFillterTab(c *types.Config) []g.Widget {
 							Border(false).
 							Size(g.Auto, g.Auto).
 							ContextMenu([]string{"Remove"}).
-								OnMenu(func(i int, m string) {
-									c.DriveFillerTags = RemoveElement(c.DriveFillerTags, int32(i))
-								}),
-					}).Size(300, 300),	
+							OnMenu(func(i int, m string) {
+								c.DriveFillerTags = RemoveElement(c.DriveFillerTags, int32(i))
+							}),
+					}).Size(300, 300),
 					g.Row(
 						g.Button("Add").OnClick(func() { g.OpenPopup("Add New Tag") }),
 					),

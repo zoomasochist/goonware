@@ -3,16 +3,19 @@ package daemon
 import (
 	types "goonware/types"
 
-	"time"
 	"math/rand"
+	"time"
+
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
-const(
+const (
 	StatePaused = iota
 	StateRunning
 )
 
 func Tick(c types.Config, pkg types.EdgewarePackage) {
+	glfw.Init()
 	// We take gooning seriously
 	rand.Seed(time.Now().UnixNano())
 
@@ -20,12 +23,15 @@ func Tick(c types.Config, pkg types.EdgewarePackage) {
 	if c.DriveFiller {
 		go WorkerManager(ws, &c, &pkg, DoDriveFiller)
 	}
+	if c.Annoyances {
+		go WorkerManager(ws, &c, &pkg, DoAnnoyances)
+	}
 
 	// Hibernation mode
 	if c.Mode == types.ModeHibernate {
 		for {
 			hibernationCountdown :=
-				rand.Intn(int(c.HibernateMaxWaitMinutes) - int(c.HibernateMinWaitMinutes) + 1) +
+				rand.Intn(int(c.HibernateMaxWaitMinutes)-int(c.HibernateMinWaitMinutes)+1) +
 					int(c.HibernateMinWaitMinutes)
 
 			time.Sleep(time.Duration(hibernationCountdown) * time.Minute)
@@ -33,7 +39,7 @@ func Tick(c types.Config, pkg types.EdgewarePackage) {
 			time.Sleep(time.Duration(c.HibernateActivityLength) * time.Second)
 			ws <- StatePaused
 		}
-	// Normal mode
+		// Normal mode
 	} else {
 		ws <- StateRunning
 		// Recieve from a nil channel; block main thread execution indefinitely.
@@ -42,7 +48,7 @@ func Tick(c types.Config, pkg types.EdgewarePackage) {
 }
 
 func WorkerManager(ws <-chan int32, c *types.Config, pkg *types.EdgewarePackage,
-		workerFunc func (*types.Config, *types.EdgewarePackage)) {
+	workerFunc func(*types.Config, *types.EdgewarePackage)) {
 	state := StatePaused
 
 	for {

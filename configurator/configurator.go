@@ -3,14 +3,14 @@ package configurator
 import (
 	types "goonware/types"
 
-	"os"
-	"errors"
 	"encoding/json"
+	"errors"
+	"os"
 
 	g "github.com/AllenDang/giu"
 )
 
-var workingDirectory   = Expect(os.UserConfigDir()) + "/goonware"
+var workingDirectory = Expect(os.UserConfigDir()) + "/goonware"
 var packageExtractDirectory = workingDirectory + "/package"
 var configFileLocation = workingDirectory + "/goonware.json"
 
@@ -33,8 +33,8 @@ func ConfiguratorUI() error {
 			g.Row(
 				g.Button("Load package").OnClick(func() { LoadPackage(&c) }),
 				g.Condition(len(c.LoadedPackage) != 0,
-					g.Layout{ g.Label("(Using package " + c.LoadedPackage + ")")},
-					g.Layout{ g.Label("(No package loaded)") },
+					g.Layout{g.Label("(Using package " + c.LoadedPackage + ")")},
+					g.Layout{g.Label("(No package loaded)")},
 				),
 			),
 
@@ -43,7 +43,7 @@ func ConfiguratorUI() error {
 				g.Button("Save and Exit").OnClick(func() { SaveAndExit(&c) }),
 				g.Row(
 					g.Checkbox("Launch on startup", &c.StartOnBoot),
-					g.Tooltip("Silently start Goonware every time your computer starts, executing" +
+					g.Tooltip("Silently start Goonware every time your computer starts, executing"+
 						" whatever package was running last time."),
 					g.Checkbox("Run Goonware on save and exit", &c.RunOnExit),
 				),
@@ -53,9 +53,9 @@ func ConfiguratorUI() error {
 				g.Label("Mode"),
 				g.RadioButton("Normal", c.Mode == types.ModeNormal).OnChange(func() { c.Mode = types.ModeNormal }),
 				g.Tooltip("As soon as Goonware starts, it will start running payloads."),
-	
+
 				g.RadioButton("Hibernate", c.Mode == types.ModeHibernate).OnChange(func() { c.Mode = types.ModeHibernate }),
-				g.Tooltip("Goonware will wait a random amount of time (within given limits) before" +
+				g.Tooltip("Goonware will wait a random amount of time (within given limits) before"+
 					" spamming payloads, then stop and start waiting again."),
 
 				ConditionOrNothing(c.Mode == types.ModeHibernate, g.Layout{
@@ -84,51 +84,51 @@ func NewOrLoadConfig() (types.Config, error) {
 		return types.Config{
 			WorkingDirectory: workingDirectory,
 			// General
-			Mode: types.ModeNormal,
+			Mode:                    types.ModeNormal,
 			HibernateMinWaitMinutes: 120,
 			HibernateMaxWaitMinutes: 3600,
 			HibernateActivityLength: 20, // Sec
-			StartOnBoot: false,
-			RunOnExit: false,
-			LoadedPackage: "",
-			LoadedPackageData: nil,
+			StartOnBoot:             false,
+			RunOnExit:               false,
+			LoadedPackage:           "",
+			LoadedPackageData:       nil,
 
 			// Annoyances
-			Annoyances: true,
-			TimerDelay: 10,
+			Annoyances:      true,
+			TimerDelay:      10,
 			AnnoyancePopups: true,
 
-			PopupChance: 50,
-			PopupOpacity: 85,
-			PopupDenialMode: false,
-			PopupDenialChance: 50,
-			PopupMitosis: true,
+			PopupChance:          50,
+			PopupOpacity:         85,
+			PopupDenialMode:      false,
+			PopupDenialChance:    50,
+			PopupMitosis:         true,
 			PopupMitosisStrength: 4,
-			PopupTimeout: false,
-			PopupTimeoutDelay: 30,
+			PopupTimeout:         false,
+			PopupTimeoutDelay:    30,
 
 			AnnoyanceVideos: true,
-			VideoChance: 25,
-			VideoVolume: 25,
+			VideoChance:     25,
+			VideoVolume:     25,
 
-			AnnoyancePrompts: true,
-			PromptChance: 25,
+			AnnoyancePrompts:  true,
+			PromptChance:      25,
 			MaxMistakesToggle: true,
-			MaxMistakes: 1,
+			MaxMistakes:       1,
 
 			AnnoyanceAudio: true,
-			AudioChance: 25,
-			AudioVolume: 25,
-			
+			AudioChance:    25,
+			AudioVolume:    25,
+
 			// Drive Filler
-			DriveFiller: false,
-			DriveFillerDelay: 1000, // Ms
-			DriveFillerBase: Expect(os.UserHomeDir()),
-			DriveFillerBooru: "https://e621.net/",
-			DriveFillerTags: []string{"feral+paws", "feral+rimming"},
-			DriveFillerImageSource: types.DriveFillerImageSourceBooru,
-			DriveFillerImageUseTags: true,
-			DriveFillerDownloadMinimumScoreToggle: false,
+			DriveFiller:                              false,
+			DriveFillerDelay:                         1000, // Ms
+			DriveFillerBase:                          Expect(os.UserHomeDir()),
+			DriveFillerBooru:                         "https://e621.net/",
+			DriveFillerTags:                          []string{"feral+paws", "feral+rimming"},
+			DriveFillerImageSource:                   types.DriveFillerImageSourceBooru,
+			DriveFillerImageUseTags:                  true,
+			DriveFillerDownloadMinimumScoreToggle:    false,
 			DriveFillerDownloadMinimumScoreThreshold: 0,
 		}, nil
 	}
