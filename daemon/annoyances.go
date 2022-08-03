@@ -6,7 +6,6 @@ import (
 	"image"
 	_ "image/jpeg"
 	"os"
-	"strings"
 	"time"
 
 	"math/rand"
@@ -27,7 +26,7 @@ var showingPopups int32
 func DoAnnoyances(c *types.Config, pkg *types.EdgewarePackage) {
 
 	willDoPopup := (rand.Intn(101) + 1) < int(c.PopupChance)
-	if c.AnnoyancePopups && willDoPopup && showingPopups < 5 {
+	if c.AnnoyancePopups && willDoPopup && showingPopups < 1 {
 		imagePath := pkg.ImageFiles[rand.Intn(len(pkg.ImageFiles))]
 
 		showingPopups++
@@ -67,7 +66,8 @@ func MakePopup(imagePath string) {
 	// is created, it (i suppose) still uses that old id it found despite the image data itself
 	// having been destroyed, resulting in image popups appearing more than once appearing garbled.
 	// This fixes that. It's also bad. Should be reported to github.com/AllenDang/giu.
-	hotfixPath := imagePath + strings.Repeat(" ", rand.Intn(150))
+	//hotfixPath := imagePath + strings.Repeat(" ", rand.Intn(150))
+	hotfixPath := imagePath
 	fmt.Println("'" + hotfixPath + "'")
 	w, h := ImageDimensions(imagePath)
 	for w > 800 || h > 600 {

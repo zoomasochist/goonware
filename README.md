@@ -1,8 +1,19 @@
+Goonware is still very much a work-in-progress and you probably won't find much
+use in it as an end-user right now. Come back later :3
+
 # Goonware
 
 Edgeware but in Go for cumming performance™
 
 ![](.github/ui.png)
+
+# Features
+
+- Complete feature parity with Edgeware, including Edgeware package support
+- Completely cross-platform
+- Portable compiled binary = much simpler to set up (and it's faster I guess)
+- More intuitive UI with tooltips
+- A new collection of "Passive" features
 
 # Build Instructions
 

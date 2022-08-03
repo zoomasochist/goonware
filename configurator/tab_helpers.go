@@ -80,7 +80,7 @@ func FormatPercentSlider(value int32) string {
 	return fmt.Sprintf("%d%%%%", value)
 }
 
-func ConditionOrNothing(condition bool, layout g.Layout) g.Layout {
+func ShowIf(condition bool, layout ...g.Widget) g.Layout {
 	if condition {
 		return layout
 	}
@@ -89,25 +89,66 @@ func ConditionOrNothing(condition bool, layout g.Layout) g.Layout {
 }
 
 func LabelSliderTooltip(label string, value *int32, min, max int32, size float32, tooltip string,
-	format func(int32) string) g.Layout {
-	return g.Layout{
+	format func(int32) string) g.Widget {
+	return g.Row(
 		g.Label(label),
 		g.SliderInt(value, min, max).Format(format(*value)).Size(size),
 		g.Tooltip(tooltip),
+	)
+}
+
+func LabelledSlider(label string, value *int32, min, max int32) g.Widget {
+	return g.Row(
+		g.Label(label),
+		g.SliderInt(value, min, max).Size(150),
+	)
+}
+
+func PercentChanceSlider(value *int32) g.Widget {
+	return LabelSliderTooltip("Chance", value, 1, 100, 150, "Chance of occurance per tick",
+		FormatSecondSlider)
+}
+
+func Setting(name string, selected *bool, widgets ...g.Widget) g.Layout {
+	return g.Layout{
+		g.Row(g.Checkbox(name, selected)),
+		ShowIf(*selected, append(widgets, g.Dummy(g.Auto, 10))...),
 	}
 }
 
-func FrequencySlider(value *int32, tooltip string) g.Layout {
+func Feature(name string, selected *bool, height float32, widgets ...g.Widget) g.Layout {
 	return g.Layout{
-		g.Label("|  Frequency"),
+		g.Row(
+			g.Checkbox(name, selected),
+		),
+
+		ShowIf(*selected, g.Child().Layout(widgets...).Size(g.Auto, height)),
+	}
+}
+
+func Tab(name string, selected *bool, widgets ...g.Widget) g.Layout {
+	return g.Layout{
+		g.Row(
+			g.Checkbox(name, selected),
+		),
+		g.Separator(),
+		g.Dummy(1, 10),
+
+		ShowIf(*selected, widgets...),
+	}
+}
+
+func ChanceSlider(value *int32, tooltip string) g.Widget {
+	return g.Row(
+		g.Label("Chance"),
 		g.SliderInt(value, 1, 100).Format(FormatPercentSlider(*value)).Size(150),
 		g.Tooltip(tooltip),
-	}
+	)
 }
 
-func StandardSeparation() g.Layout {
+func TooltipRadio(label, tooltip string, store *int32, selectedValue int32) g.Layout {
 	return g.Layout{
-		g.Separator(),
-		g.Dummy(g.Auto, 15),
+		g.RadioButton(label, *store == selectedValue).OnChange(func() { *store = selectedValue }),
+		g.Tooltip(tooltip),
 	}
 }

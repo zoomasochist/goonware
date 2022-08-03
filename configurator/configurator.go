@@ -24,8 +24,9 @@ func ConfiguratorUI() error {
 	wnd.Run(func() {
 		g.SingleWindow().Layout(
 			g.TabBar().TabItems(
-				g.TabItem("Annoyances").Layout(TabWrapper(AnnoyancesTab(&c)...)),
-				g.TabItem("Drive Filler").Layout(TabWrapper(DriveFillterTab(&c)...)),
+				g.TabItem("Annoyances").Layout(TabWrapper(AnnoyancesTab(&c))),
+				g.TabItem("Drive Filler").Layout(TabWrapper(DriveFillerTab(&c))),
+				g.TabItem("Passive").Layout(TabWrapper(PassiveTab(&c)...)),
 				// Comes last
 				g.TabItem("About").Layout(TabWrapper(AboutTab()...)),
 			),
@@ -51,21 +52,25 @@ func ConfiguratorUI() error {
 
 			g.Row(
 				g.Label("Mode"),
-				g.RadioButton("Normal", c.Mode == types.ModeNormal).OnChange(func() { c.Mode = types.ModeNormal }),
+				g.RadioButton("Normal", c.Mode == types.ModeNormal).OnChange(func() {
+					c.Mode = types.ModeNormal
+				}),
 				g.Tooltip("As soon as Goonware starts, it will start running payloads."),
 
-				g.RadioButton("Hibernate", c.Mode == types.ModeHibernate).OnChange(func() { c.Mode = types.ModeHibernate }),
+				g.RadioButton("Hibernate", c.Mode == types.ModeHibernate).OnChange(func() {
+					c.Mode = types.ModeHibernate
+				}),
 				g.Tooltip("Goonware will wait a random amount of time (within given limits) before"+
-					" spamming payloads, then stop and start waiting again."),
+					"\nspamming payloads, then stop and start waiting again."),
 
-				ConditionOrNothing(c.Mode == types.ModeHibernate, g.Layout{
+				ShowIf(c.Mode == types.ModeHibernate,
 					LabelSliderTooltip("Min. wait", &c.HibernateMinWaitMinutes, 0, 120, 50,
 						"The minimum amount of time Goonware will hibernate", FormatMinuteSlider),
 					LabelSliderTooltip("Max. wait", &c.HibernateMaxWaitMinutes, 0, 120, 50,
 						"The maximum amount of time Goonware will hibernate", FormatMinuteSlider),
 					LabelSliderTooltip("Wake for", &c.HibernateActivityLength, 1,
 						600, 50, "How long Goonware will spam payloads", FormatSecondSlider),
-				}),
+				),
 			),
 		)
 	})
@@ -111,10 +116,10 @@ func NewOrLoadConfig() (types.Config, error) {
 			VideoChance:     25,
 			VideoVolume:     25,
 
-			AnnoyancePrompts:  true,
-			PromptChance:      25,
-			MaxMistakesToggle: true,
-			MaxMistakes:       1,
+			AnnoyancePrompts: true,
+			PromptChance:     25,
+			AllowMistakes:    true,
+			MaxMistakes:      1,
 
 			AnnoyanceAudio: true,
 			AudioChance:    25,

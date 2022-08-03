@@ -10,15 +10,12 @@ import (
 	"github.com/sqweek/dialog"
 )
 
-var selectedTag int32
 var newTag string
 var booru int32
 var boorus []string = []string{"https://e621.net/", "https://rule34.xxx/"}
 
-func DriveFillterTab(c *types.Config) []g.Widget {
-	largerFont := g.GetDefaultFonts()[0].SetSize(20)
-
-	return []g.Widget{
+func DriveFillerTab(c *types.Config) g.Layout {
+	return Tab("On", &c.DriveFiller,
 		g.PopupModal("Add New Tag").Layout(g.Layout{
 			g.InputText(&newTag).Size(300),
 			g.Button("Ok").OnClick(func() {
@@ -30,74 +27,45 @@ func DriveFillterTab(c *types.Config) []g.Widget {
 			}),
 		}),
 
-		g.Checkbox("On", &c.DriveFiller),
+		LabelSliderTooltip("Fill delay", &c.DriveFillerDelay, 10, 3000, 200,
+			"Delay between each image save", FormatMillisecondSlider),
 
-		ConditionOrNothing(c.DriveFiller, g.Layout{
-			g.Row(
-				LabelSliderTooltip("Fill delay", &c.DriveFillerDelay, 10, 3000, 200,
-					"How many milliseconds to wait before writing another image",
-					FormatMillisecondSlider),
+		g.Row(
+			g.Button("Select root").OnClick(func() { SelectBase(c) }),
+			g.Label("("+c.DriveFillerBase+")"),
+		),
+		g.Tooltip("Goonware won't save images in any directory above this one"),
+
+		g.Row(
+			g.Label("Image source"),
+			TooltipRadio("Package", "Fill the drive with images taken from the loaded package",
+				&c.DriveFillerImageSource, types.DriveFillerImageSourcePackage),
+			TooltipRadio("Download", "Fill the drive with images downloaded from a booru",
+				&c.DriveFillerImageSource, types.DriveFillerImageSourceBooru),
+		),
+
+		ShowIf(c.DriveFillerImageSource == types.DriveFillerImageSourceBooru,
+			Setting("Minimum score", &c.DriveFillerDownloadMinimumScoreToggle,
+				g.SliderInt(&c.DriveFillerDownloadMinimumScoreThreshold, -50, 100).Size(150),
 			),
-			g.Row(
-				g.Button("Select base").OnClick(func() { SelectBase(c) }),
-				g.Label("("+c.DriveFillerBase+")"),
-			),
-			StandardSeparation(),
 
-			g.Row(
-				g.Label("Image source"),
-				g.RadioButton("Use Package", c.DriveFillerImageSource == types.DriveFillerImageSourcePackage).
-					OnChange(func() { c.DriveFillerImageSource = types.DriveFillerImageSourcePackage }),
-				g.Tooltip("Fill the drive with files in the currently loaded package's img directory"),
+			g.Combo("Booru", c.DriveFillerBooru, boorus, &booru).
+				Size(250).
+				OnChange(func() { c.DriveFillerBooru = boorus[booru] }),
 
-				g.RadioButton("Download", c.DriveFillerImageSource == types.DriveFillerImageSourceBooru).
-					OnChange(func() { c.DriveFillerImageSource = types.DriveFillerImageSourceBooru }),
-				g.Tooltip("Fill the drive with images downloaded from a booru of your choosing"),
-			),
-			StandardSeparation(),
-
-			ConditionOrNothing(c.DriveFillerImageSource == types.DriveFillerImageSourceBooru, g.Layout{
-				g.Row(g.Label("Image Downloader").Font(largerFont)),
-				StandardSeparation(),
-
-				g.Row(
-					g.Combo("Booru", c.DriveFillerBooru, boorus, &booru).
-						Size(250).
-						OnChange(func() { c.DriveFillerBooru = boorus[booru] }),
-				),
-
-				g.Row(
-					g.RadioButton("Anything", !c.DriveFillerImageUseTags).
-						OnChange(func() { c.DriveFillerImageUseTags = false }),
-					g.RadioButton("Specific Tags", c.DriveFillerImageUseTags).
-						OnChange(func() { c.DriveFillerImageUseTags = true }),
-				),
-				ConditionOrNothing(c.DriveFillerImageUseTags, g.Layout{
-					g.Child().Layout(g.Layout{
-						g.ListBox("Drive Filler Tags", c.DriveFillerTags).
-							Border(false).
-							Size(g.Auto, g.Auto).
-							ContextMenu([]string{"Remove"}).
-							OnMenu(func(i int, m string) {
-								c.DriveFillerTags = RemoveElement(c.DriveFillerTags, int32(i))
-							}),
-					}).Size(300, 300),
-					g.Row(
-						g.Button("Add").OnClick(func() { g.OpenPopup("Add New Tag") }),
+			Setting("Search specific tags", &c.DriveFillerImageUseTags,
+				g.ListBox("Drive Filler Tags", c.DriveFillerTags).
+					Border(false).
+					Size(300, 300).
+					ContextMenu([]string{"Remove"}).
+					OnMenu(func(i int, m string) {
+						c.DriveFillerTags = RemoveElement(c.DriveFillerTags, int32(i))
+					},
 					),
-				}),
-
-				g.Row(
-					g.Checkbox("Minimum score", &c.DriveFillerDownloadMinimumScoreToggle),
-					ConditionOrNothing(c.DriveFillerDownloadMinimumScoreToggle,
-						g.Layout{g.SliderInt(&c.DriveFillerDownloadMinimumScoreThreshold, -50, 100).
-							Size(150)},
-					),
-				),
-				StandardSeparation(),
-			}),
-		}),
-	}
+				g.Button("Add").OnClick(func() { g.OpenPopup("Add New Tag") }),
+			),
+		),
+	)
 }
 
 func SelectBase(c *types.Config) {
